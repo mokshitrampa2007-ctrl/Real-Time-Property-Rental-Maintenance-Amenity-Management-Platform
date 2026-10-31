@@ -14,6 +14,7 @@
     "build:server": "node ./node_modules/prisma/build/index.js generate --schema server/prisma/schema.prisma && node ./node_modules/typescript/bin/tsc --project server/tsconfig.json",
     "build:client": "node ./node_modules/typescript/bin/tsc --project client/tsconfig.json --noEmit && node ./node_modules/vite/bin/vite.js build client",
     "build": "npm run build:server && npm run build:client",
+    "vercel-build": "node ./node_modules/prisma/build/index.js generate --schema server/prisma/schema.prisma && npm run build:client",
     "start": "node server/dist/server.js",
     "test": "node ./node_modules/vitest/vitest.mjs run server/tests/",
     "db:start": "node ./node_modules/tsx/dist/cli.mjs server/src/scripts/start-embedded-db.ts",

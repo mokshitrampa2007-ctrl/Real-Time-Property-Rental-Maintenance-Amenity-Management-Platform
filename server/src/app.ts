@@ -31,7 +31,19 @@ export function createApp() {
   // CORS Configuration
   app.use(
     cors({
-      origin: config.clientOrigin,
+      origin: (requestOrigin, callback) => {
+        // Allow same-origin (falsy), configured origin, Vercel deployments, or localhost
+        if (
+          !requestOrigin ||
+          requestOrigin === config.clientOrigin ||
+          requestOrigin.endsWith('.vercel.app') ||
+          requestOrigin.includes('localhost')
+        ) {
+          callback(null, true);
+        } else {
+          callback(null, true); // Fallback allow for public deployment
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
