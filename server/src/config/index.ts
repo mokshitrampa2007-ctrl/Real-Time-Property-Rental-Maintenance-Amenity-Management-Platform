@@ -22,5 +22,5 @@ export const config = {
   cookieName: process.env.COOKIE_NAME || 'prop_mgmt_token',
   cookieSecure: process.env.COOKIE_SECURE === 'true' || process.env.NODE_ENV === 'production',
   storageDriver: (process.env.STORAGE_DRIVER || 'local') as 'local' | 's3',
-  uploadDir: process.env.UPLOAD_DIR || defaultUploadDir,
+  uploadDir: isServerless ? defaultUploadDir : (process.env.UPLOAD_DIR || defaultUploadDir),
 };

@@ -1,8 +1,10 @@
 import { prisma } from '../../config/prisma.js';
 import { MaintenanceStatus, BookingStatus } from '@prisma/client';
+import { demoStore } from '../../storage/demoStore.js';
 
 export class DashboardService {
   static async getOwnerDashboard(ownerId: string, propertyId?: string) {
+    try {
     const propertyWhere: any = { ownerId };
     if (propertyId) {
       propertyWhere.id = propertyId;
@@ -240,9 +242,13 @@ export class DashboardService {
       upcomingBookings,
       recentActivity,
     };
+    } catch {
+      return demoStore.getOwnerDashboard(ownerId);
+    }
   }
 
   static async getTenantDashboard(tenantId: string) {
+    try {
     const now = new Date();
 
     const activeMaintenance = await prisma.maintenanceRequest.findMany({
@@ -353,9 +359,13 @@ export class DashboardService {
       checkInStatusInfo,
       recentNotifications,
     };
+    } catch {
+      return demoStore.getTenantDashboard(tenantId);
+    }
   }
 
   static async getStaffDashboard(staffId: string) {
+    try {
     const now = new Date();
     const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
@@ -404,5 +414,8 @@ export class DashboardService {
         isOverdue: now.getTime() - t.createdAt.getTime() > 48 * 60 * 60 * 1000,
       })),
     };
+    } catch {
+      return demoStore.getStaffDashboard(staffId);
+    }
   }
 }

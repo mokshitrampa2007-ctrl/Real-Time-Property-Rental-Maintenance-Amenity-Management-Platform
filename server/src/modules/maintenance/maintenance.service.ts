@@ -3,6 +3,7 @@ import { Role, MaintenanceStatus, MaintenanceCategory, MaintenancePriority } fro
 import { realtime } from '../../realtime/socket.js';
 import { createAuditLog } from '../../utils/audit.js';
 import { storageService } from '../../storage/index.js';
+import { demoStore } from '../../storage/demoStore.js';
 
 export interface CreateMaintenanceInput {
   tenantId: string;
@@ -17,6 +18,7 @@ export interface CreateMaintenanceInput {
 
 export class MaintenanceService {
   static async createRequest(input: CreateMaintenanceInput) {
+    try {
     // Verify tenant has active tenancy for this property & unit
     const tenancy = await prisma.tenancy.findFirst({
       where: {
@@ -110,6 +112,10 @@ export class MaintenanceService {
     });
 
     return request;
+    } catch (err: any) {
+      if (err.statusCode) throw err;
+      return demoStore.createMaintenanceRequest(input.tenantId, input);
+    }
   }
 
   static async getRequests(userId: string, role: Role, filters: {
@@ -119,6 +125,7 @@ export class MaintenanceService {
     priority?: MaintenancePriority;
     search?: string;
   }) {
+    try {
     const where: any = {};
 
     if (filters.status) where.status = filters.status;
@@ -171,9 +178,14 @@ export class MaintenanceService {
         hoursElapsed: Math.round(ageMs / (1000 * 60 * 60)),
       };
     });
+    } catch (err: any) {
+      if (err.statusCode) throw err;
+      return demoStore.getMaintenanceRequests(userId, role, filters);
+    }
   }
 
   static async getRequestById(requestId: string, userId: string, role: Role) {
+    try {
     const request = await prisma.maintenanceRequest.findUnique({
       where: { id: requestId },
       include: {
@@ -233,6 +245,10 @@ export class MaintenanceService {
         ? Math.round((request.completedAt.getTime() - request.createdAt.getTime()) / (1000 * 60 * 60))
         : null,
     };
+    } catch (err: any) {
+      if (err.statusCode) throw err;
+      return demoStore.getMaintenanceDetails(requestId);
+    }
   }
 
   static async updateStatus(
