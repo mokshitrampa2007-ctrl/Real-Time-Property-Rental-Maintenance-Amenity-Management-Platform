@@ -22,8 +22,12 @@ export class LocalStorageService implements IStorageService {
 
   constructor(uploadDir: string = config.uploadDir) {
     this.uploadDir = uploadDir;
-    if (!fs.existsSync(this.uploadDir)) {
-      fs.mkdirSync(this.uploadDir, { recursive: true });
+    try {
+      if (!fs.existsSync(this.uploadDir)) {
+        fs.mkdirSync(this.uploadDir, { recursive: true });
+      }
+    } catch (err) {
+      logger.warn(`Notice: Upload directory could not be created at initialization (${this.uploadDir})`);
     }
   }
 
@@ -31,6 +35,15 @@ export class LocalStorageService implements IStorageService {
     const ext = path.extname(file.originalname).toLowerCase();
     const randomHex = crypto.randomBytes(16).toString('hex');
     const storageKey = `${Date.now()}-${randomHex}${ext}`;
+
+    try {
+      if (!fs.existsSync(this.uploadDir)) {
+        fs.mkdirSync(this.uploadDir, { recursive: true });
+      }
+    } catch (err) {
+      logger.warn(`Notice: Upload directory creation failed on saveFile:`, err);
+    }
+
     const destination = path.join(this.uploadDir, storageKey);
 
     if (file.buffer) {
