@@ -21,6 +21,9 @@ import notificationRoutes from './modules/notifications/notification.routes.js';
 export function createApp() {
   const app = express();
 
+  // Trust first proxy (required for Vercel, AWS Lambda, Cloudflare, Heroku reverse proxies)
+  app.set('trust proxy', 1);
+
   // Security Headers
   app.use(
     helmet({
